@@ -22,7 +22,6 @@ If you're using the `dj-database-url <https://crate.io/packages/dj-database-url/
 
 .. code:: python
 
-
     import dj_database_url
 
     DATABASES['default'] = dj_database_url.config()
