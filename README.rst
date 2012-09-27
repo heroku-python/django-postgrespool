@@ -1,9 +1,11 @@
 Django-PostgresPool
 ===================
 
-This is a simple Postgres Connection Pool backend for Django —  experimental, so use with caution.
+This is a simple Postgres Connection Pooling backend for Django.
 
-It's powered by the lovely and beautiful SQLAlchemy.
+It's powered by the lovely and beautiful SQLAlchemy and Psycopg2.
+
+**Experimental**: use with caution.
 
 
 Usage
