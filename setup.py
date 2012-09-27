@@ -31,7 +31,7 @@ setup(
     install_requires=required,
     license='MIT',
     classifiers=(
-        'Development Status :: 5 - Production/Stable',
+        # 'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'License :: OSI Approved :: MIT License',
@@ -39,7 +39,7 @@ setup(
         'Programming Language :: Python :: 2.5',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.0',
-        'Programming Language :: Python :: 3.1',
+        # 'Programming Language :: Python :: 3.0',
+        # 'Programming Language :: Python :: 3.1',
     ),
 )
