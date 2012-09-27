@@ -27,7 +27,7 @@ Everything should work as expected.
 
 
 Installation
------------
+------------
 
 Installing Django-PostgresPool is simple, with pip::
 
