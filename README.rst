@@ -11,16 +11,16 @@ Usage
 
 Using Django-PostgresPool is simple, just set ``django_postgrespool`` as your connection engine:
 
-.. code:: python
+::
 
     DATABASES = {
         'default': {
             'ENGINE': 'django_postgrespool'
-    ...
+
 
 If you're using the `dj-database-url <https://crate.io/packages/dj-database-url/>`_ module:
 
-.. code:: python
+::
 
     import dj_database_url
 
