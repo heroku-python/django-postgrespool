@@ -9,9 +9,8 @@ It's powered by the lovely and beautiful SQLAlchemy.
 Usage
 -----
 
-Using Django-PostgresPool is simple, just set ``django_postgrespool`` as your connection engine:
+Using Django-PostgresPool is simple, just set ``django_postgrespool`` as your connection engine::
 
-::
     DATABASES = {
         'default': {
             'ENGINE': 'django_postgrespool'
