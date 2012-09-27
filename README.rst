@@ -1,4 +1,4 @@
-django-postgrespool
+Django-PostgresPool
 ===================
 
 This is an elegant Postgres Connection Pool backend for Django. Use with caution.
