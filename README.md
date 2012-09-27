@@ -1,4 +1,12 @@
 django-postgrespool
 ===================
 
-EXPERIMENTAL Postgres Connection Pooling for Django.
+This is an EXPERIMENTAL Postgres Connection Pool backend for Django.
+
+Use with caution.
+
+
+Powered By
+----------
+
+- SQLAlchemy, of course.
