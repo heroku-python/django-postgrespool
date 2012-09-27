@@ -10,3 +10,11 @@ Powered By
 ----------
 
 - SQLAlchemy, of course.
+
+
+Usage
+-----
+
+::
+
+    'django_postgrespool.PostgresPool'
