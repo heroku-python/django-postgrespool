@@ -20,7 +20,7 @@ db_pool = manage(Database, **pool_args)
 log = logging.getLogger('z.pool')
 
 def _log(message, *args):
-    log.debug('%s' % (message)
+    log.debug(message)
 
 # Only hook up the listeners if we are in debug mode.
 if settings.DEBUG:
