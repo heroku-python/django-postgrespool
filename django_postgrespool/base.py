@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 from functools import partial
 
 from sqlalchemy import event
