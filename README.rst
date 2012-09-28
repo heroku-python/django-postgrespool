@@ -27,6 +27,15 @@ If you're using the `dj-database-url <https://crate.io/packages/dj-database-url/
     DATABASES['default'] = dj_database_url.config()
     DATABASES['default']['ENGINE'] = 'django_postgrespool'
 
+If you're using `south <http://south.aeracode.org>`_:
+
+::
+
+    SOUTH_DATABASE_ADAPTERS = {
+        'default': 'south.db.postgresql_psycopg2'
+    }
+
+
 Everything should work as expected.
 
 
