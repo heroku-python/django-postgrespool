@@ -21,7 +21,7 @@ required = [
 
 setup(
     name='django-postgrespool',
-    version='0.1.0',
+    version='0.1.1',
     description='Postgres Connection Pooling for Django.',
     long_description=open('README.rst').read(),
     author='Kenneth Reitz',
