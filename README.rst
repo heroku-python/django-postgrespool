@@ -36,3 +36,14 @@ Installation
 Installing Django-PostgresPool is simple, with pip::
 
     $ pip install django-postgrespool
+
+Configuration
+-------------
+
+Optionally, you can provide additional options to pass to SQLAlchemy's pool creation::
+
+    DATABASE_POOL_ARGS = {
+        'max_overflow': 10,
+        'pool_size': 5,
+        'recycle': 300
+    }

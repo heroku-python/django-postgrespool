@@ -1,11 +1,31 @@
 # -*- coding: utf-8 -*-
 
-import sqlalchemy.pool as pool
+from functools import partial
 
+from sqlalchemy import event
+from sqlalchemy.pool import manage, QueuePool
+
+from django.conf import settings
 from django.db.backends.postgresql_psycopg2.base import *
 from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper as Psycopg2DatabaseWrapper
 
-Database_ = pool.manage(Database)
+POOL_SETTINGS = 'DATABASE_POOL_ARGS'
+
+# DATABASE_POOL_ARGS should be something like:
+# {'max_overflow':10, 'pool_size':5, 'recycle':300}
+pool_args = getattr(settings, POOL_SETTINGS, {})
+db_pool = manage(Database, **pool_args)
+
+log = logging.getLogger('z.pool')
+
+def _log(message, *args):
+    log.debug('%s to %s' % (message, args[0].get_host_info()))
+
+# Only hook up the listeners if we are in debug mode.
+if settings.DEBUG:
+    event.listen(QueuePool, 'checkout', partial(_log, 'retrieved from pool'))
+    event.listen(QueuePool, 'checkin', partial(_log, 'returned to pool'))
+    event.listen(QueuePool, 'connect', partial(_log, 'new connection'))
 
 
 class DatabaseWrapper(Psycopg2DatabaseWrapper):
@@ -36,7 +56,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
                 conn_params['host'] = settings_dict['HOST']
             if settings_dict['PORT']:
                 conn_params['port'] = settings_dict['PORT']
-            self.connection = Database_.connect(**conn_params)
+            self.connection = db_pool.connect(**conn_params)
             self.connection.set_client_encoding('UTF8')
             tz = 'UTC' if settings.USE_TZ else settings_dict.get('TIME_ZONE')
             if tz:
