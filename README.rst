@@ -3,8 +3,6 @@ Django-PostgresPool
 
 This is a simple Postgres Connection Pooling backend for Django, powered by the lovely and beautiful SQLAlchemy.
 
-**Experimental**: use with caution.
-
 
 Usage
 -----
