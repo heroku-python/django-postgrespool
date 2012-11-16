@@ -11,6 +11,7 @@ from django.conf import settings
 from django.db.backends.postgresql_psycopg2.base import *
 from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper as Psycopg2DatabaseWrapper
 from django.db.backends.postgresql_psycopg2.base import CursorWrapper as DjangoCursorWrapper
+from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation as Psycopg2DatabaseCreation
 
 POOL_SETTINGS = 'DATABASE_POOL_ARGS'
 
@@ -92,37 +93,25 @@ class CursorWrapper(DjangoCursorWrapper):
             raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
 
+class DatabaseCreation(Psycopg2DatabaseCreation):
+    def destroy_test_db(self, *args, **kw):
+        """Ensure connection pool is disposed before trying to drop database."""
+        self.connection._dispose()
+        super(DatabaseCreation, self).destroy_test_db(*args, **kw)
+
+
 class DatabaseWrapper(Psycopg2DatabaseWrapper):
     """SQLAlchemy FTW."""
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
+        self.creation = DatabaseCreation(self)
 
     def _cursor(self):
-        settings_dict = self.settings_dict
         if self.connection is None:
-            if not settings_dict['NAME']:
-                from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured(
-                    "settings.DATABASES is improperly configured. "
-                    "Please supply the NAME value.")
-            conn_params = {
-                'database': settings_dict['NAME'],
-            }
-            conn_params.update(settings_dict['OPTIONS'])
-            if 'autocommit' in conn_params:
-                del conn_params['autocommit']
-            if settings_dict['USER']:
-                conn_params['user'] = settings_dict['USER']
-            if settings_dict['PASSWORD']:
-                conn_params['password'] = settings_dict['PASSWORD']
-            if settings_dict['HOST']:
-                conn_params['host'] = settings_dict['HOST']
-            if settings_dict['PORT']:
-                conn_params['port'] = settings_dict['PORT']
-            self.connection = db_pool.connect(**conn_params)
+            self.connection = db_pool.connect(**self._get_conn_params())
             self.connection.set_client_encoding('UTF8')
-            tz = 'UTC' if settings.USE_TZ else settings_dict.get('TIME_ZONE')
+            tz = 'UTC' if settings.USE_TZ else self.settings_dict.get('TIME_ZONE')
             if tz:
                 try:
                     get_parameter_status = self.connection.get_parameter_status
@@ -144,3 +133,40 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return CursorWrapper(cursor, self.connection)
+
+    def _dispose(self):
+        """Dispose of the pool for this instance, closing all connections."""
+        self.close()
+        # _DBProxy.dispose doesn't actually call dispose on the pool
+        conn_params = self._get_conn_params()
+        key = db_pool._serialize(**conn_params)
+        try:
+            pool = db_pool.pools[key]
+        except KeyError:
+            pass
+        else:
+            pool.dispose()
+            del db_pool.pools[key]
+
+    def _get_conn_params(self):
+        settings_dict = self.settings_dict
+        if not settings_dict['NAME']:
+            from django.core.exceptions import ImproperlyConfigured
+            raise ImproperlyConfigured(
+                "settings.DATABASES is improperly configured. "
+                "Please supply the NAME value.")
+        conn_params = {
+            'database': settings_dict['NAME'],
+        }
+        conn_params.update(settings_dict['OPTIONS'])
+        if 'autocommit' in conn_params:
+            del conn_params['autocommit']
+        if settings_dict['USER']:
+            conn_params['user'] = settings_dict['USER']
+        if settings_dict['PASSWORD']:
+            conn_params['password'] = settings_dict['PASSWORD']
+        if settings_dict['HOST']:
+            conn_params['host'] = settings_dict['HOST']
+        if settings_dict['PORT']:
+            conn_params['port'] = settings_dict['PORT']
+        return conn_params
