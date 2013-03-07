@@ -1,7 +1,7 @@
 Django-PostgresPool
 ===================
 
-This is a simple Postgres Connection Pooling backend for Django, powered by the lovely and beautiful SQLAlchemy.
+This is a simple Postgres Connection Pooling backend for Django 1.4+, powered by the lovely and beautiful SQLAlchemy.
 
 
 Usage
@@ -54,3 +54,8 @@ Optionally, you can provide additional options to pass to SQLAlchemy's pool crea
         'pool_size': 5,
         'recycle': 300
     }
+
+Django 1.3 Support
+------------------
+
+django-postgrespool currently supports Django 1.4 and greater. See `this ticket <https://github.com/kennethreitz/django-postgrespool/pull/9>`_ for 1.3 support.
