@@ -134,6 +134,14 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return CursorWrapper(cursor, self.connection)
 
+    def _commit(self):
+        if self.connection is not None and self.connection.is_valid:
+            return self.connection.commit()
+
+    def _rollback(self):
+        if self.connection is not None and self.connection.is_valid:
+            return self.connection.rollback()
+
     def _dispose(self):
         """Dispose of the pool for this instance, closing all connections."""
         self.close()
