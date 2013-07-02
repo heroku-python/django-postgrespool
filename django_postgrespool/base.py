@@ -108,7 +108,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
         self.creation = DatabaseCreation(self)
 
     def _cursor(self):
-        if self.connection is None:
+        if self.connection is None or self.connection.is_valid == False:
             self.connection = db_pool.connect(**self._get_conn_params())
             self.connection.set_client_encoding('UTF8')
             tz = 'UTC' if settings.USE_TZ else self.settings_dict.get('TIME_ZONE')
