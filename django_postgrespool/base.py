@@ -98,11 +98,13 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
 
     def _commit(self):
         if self.connection is not None and self.connection.is_valid:
-            return self.connection.commit()
+            with self.wrap_database_errors:
+                return self.connection.commit()
 
     def _rollback(self):
         if self.connection is not None and self.connection.is_valid:
-            return self.connection.rollback()
+            with self.wrap_database_errors:
+                return self.connection.rollback()
 
     def _dispose(self):
         """Dispose of the pool for this instance, closing all connections."""
