@@ -10,7 +10,6 @@ from psycopg2 import InterfaceError, ProgrammingError, OperationalError
 from django.conf import settings
 from django.db.backends.postgresql_psycopg2.base import *
 from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper as Psycopg2DatabaseWrapper
-from django.db.backends.postgresql_psycopg2.base import CursorWrapper as DjangoCursorWrapper
 from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation as Psycopg2DatabaseCreation
 
 POOL_SETTINGS = 'DATABASE_POOL_ARGS'
@@ -57,42 +56,6 @@ def is_disconnect(e, connection, cursor):
         return False
 
 
-class CursorWrapper(DjangoCursorWrapper):
-    """
-    A thin wrapper around psycopg2's normal cursor class so that we can catch
-    particular exception instances and reraise them with the right types.
-
-    Checks for connection state on DB API error and invalidates
-    broken connections.
-    """
-
-    def __init__(self, cursor, connection):
-        self.cursor = cursor
-        self.connection = connection
-
-    def execute(self, query, args=None):
-        try:
-            return self.cursor.execute(query, args)
-        except Database.IntegrityError, e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
-            if is_disconnect(e, self.connection.connection, self.cursor):
-                log.error("invalidating broken connection")
-                self.connection.invalidate()
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
-
-    def executemany(self, query, args):
-        try:
-            return self.cursor.executemany(query, args)
-        except Database.IntegrityError, e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
-            if is_disconnect(e, self.connection.connection, self.cursor):
-                log.error("invalidating broken connection")
-                self.connection.invalidate()
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
-
-
 class DatabaseCreation(Psycopg2DatabaseCreation):
     def destroy_test_db(self, *args, **kw):
         """Ensure connection pool is disposed before trying to drop database."""
@@ -128,11 +91,10 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
                     self.connection.cursor().execute(
                             self.ops.set_time_zone_sql(), [tz])
             self.connection.set_isolation_level(self.isolation_level)
-            self._get_pg_version()
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
-        return CursorWrapper(cursor, self.connection)
+        return cursor
 
     def _commit(self):
         if self.connection is not None and self.connection.is_valid:
