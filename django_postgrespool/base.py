@@ -7,6 +7,8 @@ from sqlalchemy import event
 from sqlalchemy.pool import manage, QueuePool
 from psycopg2 import InterfaceError, ProgrammingError, OperationalError
 
+from django.db import transaction
+
 from django.conf import settings
 from django.db.backends.postgresql_psycopg2.base import *
 from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper as Psycopg2DatabaseWrapper
@@ -73,6 +75,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
     def _cursor(self):
         if self.connection is None or self.connection.is_valid == False:
             self.connection = db_pool.connect(**self._get_conn_params())
+            transaction.set_autocommit(True)
             self.connection.set_client_encoding('UTF8')
             tz = 'UTC' if settings.USE_TZ else self.settings_dict.get('TIME_ZONE')
             if tz:
@@ -131,8 +134,10 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
             'database': settings_dict['NAME'],
         }
         conn_params.update(settings_dict['OPTIONS'])
+
         if 'autocommit' in conn_params:
             del conn_params['autocommit']
+
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']
         if settings_dict['PASSWORD']:
