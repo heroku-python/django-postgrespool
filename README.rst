@@ -22,8 +22,7 @@ If you're using the `dj-database-url <https://crate.io/packages/dj-database-url/
 
     import dj_database_url
 
-    DATABASES['default'] = dj_database_url.config()
-    DATABASES['default']['ENGINE'] = 'django_postgrespool'
+    DATABASES = {'default': dj_database_url.config(engine='django_postgrespool')}
 
 If you're using `south <http://south.aeracode.org>`_:
 
