@@ -21,7 +21,7 @@ required = [
 
 setup(
     name='django-postgrespool',
-    version='0.3.0',
+    version='0.3.1',
     description='Postgres Connection Pooling for Django.',
     long_description=open('README.rst').read(),
     author='Kenneth Reitz',
@@ -30,7 +30,7 @@ setup(
     packages= ['django_postgrespool'],
     install_requires=required,
     license='MIT',
-    classifiers=(
+    classifiers=[
         # 'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Natural Language :: English',
@@ -41,5 +41,5 @@ setup(
         'Programming Language :: Python :: 2.7',
         # 'Programming Language :: Python :: 3.0',
         # 'Programming Language :: Python :: 3.1',
-    ),
+    ],
 )
