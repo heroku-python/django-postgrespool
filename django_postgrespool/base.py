@@ -10,9 +10,15 @@ from psycopg2 import InterfaceError, ProgrammingError, OperationalError
 # from django.db import transaction
 
 from django.conf import settings
-from django.db.backends.postgresql_psycopg2.base import *
-from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper as Psycopg2DatabaseWrapper
-from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation as Psycopg2DatabaseCreation
+try:
+    # Django >= 1.9
+    from django.db.backends.postgresql.base import *
+    from django.db.backends.postgresql.base import DatabaseWrapper as Psycopg2DatabaseWrapper
+    from django.db.backends.postgresql.creation import DatabaseCreation as Psycopg2DatabaseCreation
+except ImportError:
+    from django.db.backends.postgresql_psycopg2.base import *
+    from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper as Psycopg2DatabaseWrapper
+    from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation as Psycopg2DatabaseCreation
 
 POOL_SETTINGS = 'DATABASE_POOL_ARGS'
 
