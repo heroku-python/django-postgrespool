@@ -101,3 +101,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
         else:
             pool.dispose()
             del db_pool.pools[key]
+    
+    def is_usable(self):
+        # https://github.com/kennethreitz/django-postgrespool/issues/24
+        return not self.connection.closed
